@@ -1,4 +1,5 @@
 
+
 # SimpleAuthSDK
 
 A lightweight, thread-safe authentication SDK for iOS that provides secure user authentication with configurable options.
