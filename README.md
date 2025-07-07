@@ -170,7 +170,7 @@ For testing purposes, the SDK accepts these mock credentials:
 ## Dependencies
 
 This SDK depends on:
-- [LoggerSDK](https://github.com/yourusername/LoggerSDK.git) - For comprehensive logging functionality
+- [LoggerSDK](https://github.com/vincentjoy/LoggerSDK.git) - For comprehensive logging functionality
 
 ## Best Practices
 
