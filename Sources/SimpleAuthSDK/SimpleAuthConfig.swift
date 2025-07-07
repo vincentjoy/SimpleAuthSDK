@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import LoggerSDK
 
 /// Configuration object for initializing the SimpleAuth SDK
 public struct SimpleAuthConfig {
@@ -33,7 +34,7 @@ public struct SimpleAuthConfig {
     ///   - apiKey: API key for authentication
     ///   - simulatedNetworkDelay: Network delay simulation in seconds (default: 1.0)
     ///   - tokenExpirySeconds: Token expiry time in seconds (default: 3600)
-    ///   - logger: Optional logger implementation
+    ///   - logger: Optional logger instance from LoggerSDK
     ///   - disableRandomErrors: Disable random server errors (default: false)
     public init(
         apiKey: String,
@@ -47,36 +48,5 @@ public struct SimpleAuthConfig {
         self.tokenExpirySeconds = tokenExpirySeconds
         self.logger = logger
         self.disableRandomErrors = disableRandomErrors
-    }
-}
-
-// MARK: - Logger Protocol
-
-/// Protocol for implementing custom logging functionality
-public protocol Logger {
-    /// Logs a message with the specified level
-    /// - Parameters:
-    ///   - message: The message to log
-    ///   - level: The log level
-    func log(_ message: String, level: LogLevel)
-}
-
-/// Log levels for the Logger protocol
-public enum LogLevel {
-    case debug
-    case info
-    case warning
-    case error
-}
-
-// MARK: - Default Logger Implementation
-
-/// Default console logger implementation
-public class ConsoleLogger: Logger {
-    public init() {}
-    
-    public func log(_ message: String, level: LogLevel) {
-        let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
-        print("[\(timestamp)] [SimpleAuth] [\(level)] \(message)")
     }
 }

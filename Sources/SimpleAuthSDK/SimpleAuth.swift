@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import LoggerSDK
 
 /// The main authentication SDK class that provides secure user authentication
 /// with configurable options and thread-safe operations.
@@ -36,7 +37,7 @@ public actor SimpleAuth {
     public init(config: SimpleAuthConfig) {
         self.config = config
         self.logger = config.logger
-        logger?.log("SimpleAuth initialized with API key: \(config.apiKey)", level: .info)
+        logger?.info("SimpleAuth initialized with API key: \(config.apiKey)")
     }
     
     // MARK: - Public Methods
@@ -48,27 +49,36 @@ public actor SimpleAuth {
     /// - Returns: An AuthToken containing access token and expiry information
     /// - Throws: AuthError if authentication fails
     public func login(username: String, password: String) async throws -> AuthToken {
-        logger?.log("Attempting login for user: \(username)", level: .info)
+        logger?.info("Attempting login for user: \(username)")
         
         // Validate input
         guard !username.isEmpty, !password.isEmpty else {
-            logger?.log("Login failed: empty credentials", level: .error)
+            logger?.error("Login failed: empty credentials")
             throw AuthError.invalidCredentials
         }
         
         // Simulate network delay
         let delay = config.simulatedNetworkDelay
-        try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        if #available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *) {
+            try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        } else {
+            // Fallback for older OS versions
+            await withCheckedContinuation { continuation in
+                DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                    continuation.resume()
+                }
+            }
+        }
         
         // Simulate random server errors (5% chance)
         if Double.random(in: 0...1) < 0.05 && !config.disableRandomErrors {
-            logger?.log("Login failed: simulated server error", level: .error)
+            logger?.error("Login failed: simulated server error")
             throw AuthError.serverError("Simulated server error")
         }
         
         // Check credentials
         guard validCredentials[username] == password else {
-            logger?.log("Login failed: invalid credentials for user: \(username)", level: .error)
+            logger?.error("Login failed: invalid credentials for user: \(username)")
             throw AuthError.invalidCredentials
         }
         
@@ -82,14 +92,14 @@ public actor SimpleAuth {
         
         // Store token
         currentToken = token
-        logger?.log("Login successful for user: \(username)", level: .info)
+        logger?.info("Login successful for user: \(username)")
         
         return token
     }
     
     /// Logs out the current user by clearing the stored token
     public func logout() {
-        logger?.log("User logged out", level: .info)
+        logger?.info("User logged out")
         currentToken = nil
     }
     
@@ -123,11 +133,20 @@ public actor SimpleAuth {
             throw AuthError.tokenExpired
         }
         
-        logger?.log("Refreshing token", level: .info)
+        logger?.info("Refreshing token")
         
         // Simulate network delay
         let delay = config.simulatedNetworkDelay * 0.5 // Refresh is faster
-        try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        if #available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *) {
+            try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        } else {
+            // Fallback for older OS versions
+            await withCheckedContinuation { continuation in
+                DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+                    continuation.resume()
+                }
+            }
+        }
         
         // Generate new token
         let newToken = AuthToken(
@@ -138,7 +157,7 @@ public actor SimpleAuth {
         )
         
         self.currentToken = newToken
-        logger?.log("Token refreshed successfully", level: .info)
+        logger?.info("Token refreshed successfully")
         
         return newToken
     }

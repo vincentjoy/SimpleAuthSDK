@@ -1,5 +1,3 @@
-
-
 # SimpleAuthSDK
 
 A lightweight, thread-safe authentication SDK for iOS that provides secure user authentication with configurable options.
@@ -9,7 +7,7 @@ A lightweight, thread-safe authentication SDK for iOS that provides secure user 
 - 🔐 **Secure Authentication**: Username/password based authentication with simulated async operations
 - 🧵 **Thread-Safe**: Built using Swift's `actor` model for safe concurrent access
 - 🔄 **Token Management**: Automatic token lifecycle management with refresh capabilities
-- 📝 **Comprehensive Logging**: Built-in logger protocol for debugging and monitoring
+- 📝 **Comprehensive Logging**: Integrated with LoggerSDK for robust logging capabilities
 - ⚡ **Configurable**: Flexible configuration options for network delays and token expiry
 - 🧪 **Well-Tested**: Comprehensive unit test suite included
 
@@ -18,6 +16,7 @@ A lightweight, thread-safe authentication SDK for iOS that provides secure user 
 - iOS 13.0+
 - Swift 5.5+
 - Xcode 13.0+
+- LoggerSDK 1.0.0+
 
 ## Installation
 
@@ -27,7 +26,7 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/vincentjoy/SimpleAuthSDK.git", from: "1.0.3")
+    .package(url: "https://github.com/vincentjoy/SimpleAuthSDK.git", from: "1.0.4")
 ]
 ```
 
@@ -55,21 +54,23 @@ do {
 ### Advanced Configuration
 
 ```swift
-// Create a custom logger
-class MyLogger: Logger {
-    func log(_ message: String, level: LogLevel) {
-        print("[\(level)] \(message)")
-    }
-}
+import LoggerSDK
+
+// Create a logger instance
+let logger = Logger(minimumLevel: .info)
 
 // Configure with custom options
 let config = SimpleAuthConfig(
     apiKey: "your-api-key",
     simulatedNetworkDelay: 2.0,        // 2 second delay
     tokenExpirySeconds: 7200,           // 2 hour expiry
-    logger: MyLogger(),                 // Custom logger
+    logger: logger,                     // Logger instance from LoggerSDK
     disableRandomErrors: false          // Enable random errors for testing
 )
+
+// Access logs later
+let recentLogs = logger.getRecentLogs()
+let errorLogs = logger.getRecentLogs(level: .error)
 ```
 
 ### Token Management
@@ -121,7 +122,7 @@ Configuration object for the SDK.
 - `apiKey: String` - API key for SDK initialization
 - `simulatedNetworkDelay: TimeInterval` - Network simulation delay (default: 1.0)
 - `tokenExpirySeconds: TimeInterval` - Token validity duration (default: 3600)
-- `logger: Logger?` - Optional logger implementation
+- `logger: Logger?` - Optional Logger instance from LoggerSDK
 - `disableRandomErrors: Bool` - Disable random server errors (default: false)
 
 ### AuthToken
@@ -166,11 +167,16 @@ For testing purposes, the SDK accepts these mock credentials:
 - Username: `admin`, Password: `admin123`
 - Username: `test`, Password: `test123`
 
+## Dependencies
+
+This SDK depends on:
+- [LoggerSDK](https://github.com/yourusername/LoggerSDK.git) - For comprehensive logging functionality
+
 ## Best Practices
 
 1. **Error Handling**: Always handle authentication errors appropriately
 2. **Token Storage**: The SDK manages tokens in memory only. For persistence, implement your own secure storage
-3. **Logging**: Use the logger protocol for debugging in development, disable in production
+3. **Logging**: Use LoggerSDK's features for debugging in development, configure appropriate log levels for production
 4. **Thread Safety**: The SDK is thread-safe, safe to call from any thread/queue
 
 ## License

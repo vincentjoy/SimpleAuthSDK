@@ -14,7 +14,9 @@ let package = Package(
             name: "SimpleAuthSDK",
             targets: ["SimpleAuthSDK"]),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/vincentjoy/LoggerSDK.git", from: "1.0.1")
+    ],
     targets: [
         .target(
             name: "SimpleAuthSDK",
